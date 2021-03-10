@@ -2,6 +2,7 @@ package edu.uclm.es.ds2021;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.json.JSONObject;
@@ -11,8 +12,15 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 public class App {
+
 	public static void main(String[] args) {
 
+		ProductoDao.crearTabla();
+		chrome();
+
+	}
+
+	private static void chrome() {
 		System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
 		WebDriver driver = new ChromeDriver();
 
@@ -63,10 +71,9 @@ public class App {
 			e.printStackTrace();
 //			fos.write("]".getBytes());
 		}
-
 	}
 
-	private static void procesarPagina(WebDriver driver, FileOutputStream fos) throws IOException {
+	private static void procesarPagina(WebDriver driver, FileOutputStream fos) throws IOException, SQLException {
 		String precio;
 		WebElement spanPrecio;
 		List<WebElement> divProductos = driver.findElements(By.className("product-card__parent"));
@@ -81,6 +88,8 @@ public class App {
 			WebElement h2 = divProducto.findElement(By.tagName("h2"));
 			String nombre = h2.getText();
 			System.out.println(nombre + "..." + precio);
+
+			ProductoDao.insertarProducto(new Producto(nombre, precio)); // !!!
 
 			JSONObject jso = new JSONObject();
 			jso.put("nombre", nombre);
